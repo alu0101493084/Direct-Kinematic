@@ -89,6 +89,33 @@ def matriz_T(d,theta,a,alpha):
          ,[      0,          sin(al),          cos(al),         d]
          ,[      0,                0,                0,         1]
          ]
+
+def ask_new_input():
+  new_input = input('Enter new values: ')
+  if new_input == '':
+    sys.exit()
+  new_input = [float(value) for value in (new_input.split())]
+  return new_input
+
+def update_manipulator(new_input):
+  invalid_input = True
+  while invalid_input:
+    if filename == 'manipulators/m1.txt':
+      if len(new_input) != 2:
+        print('The input needs two values for the theta variables.')
+        new_input = ask_new_input()
+      else:
+        invalid_input = False
+        manipulator[1] = new_input
+    elif filename == 'manipulators/m2.txt':
+      if len(new_input) != 3:
+        print('The input needs values for theta1, L2, and theta3.')
+        new_input = ask_new_input()
+      else:
+        invalid_input = False
+        manipulator[1][0] = new_input[0]
+        manipulator[2][1] = new_input[1]
+        manipulator[1][2] = new_input[2]
 # ******************************************************************************
 
 # Introducción de los valores de las articulaciones
@@ -107,24 +134,26 @@ with open(filename, 'r') as file:
     values = [float(value) for value in line]
     manipulator.append(values)
 
+while True:
+  # Orígenes para cada articulación
+  origins = [[0,0,0,1] for i in range(number_of_joints)]
 
+  # Cálculo matrices transformación
+  result = matriz_T(manipulator[0][0], manipulator[1][0], manipulator[2][0], manipulator[3][0])
+  T_matrices = [result]
+  for i in range(1,number_of_joints):
+    result2 = matriz_T(manipulator[0][i], manipulator[1][i], manipulator[2][i], manipulator[3][i])
+    result = np.dot(result, result2)
+    T_matrices.append(result)
 
-# Orígenes para cada articulación
-origins = [[0,0,0,1] for i in range(number_of_joints)]
+  # Transformación de cada articulación
+  new_origins = [[0,0,0,1]]
+  for i in range(len(origins)):
+    new_origins.append(np.dot(T_matrices[i], origins[i]).tolist())
 
-# Cálculo matrices transformación
-result = matriz_T(manipulator[0][0], manipulator[1][0], manipulator[2][0], manipulator[3][0])
-T_matrices = [result]
-for i in range(1,number_of_joints):
-  result2 = matriz_T(manipulator[0][i], manipulator[1][i], manipulator[2][i], manipulator[3][i])
-  result = np.dot(result, result2)
-  T_matrices.append(result)
+  # Mostrar resultado de la cinemática directa
+  muestra_origenes(new_origins)
+  muestra_robot(new_origins)
 
-# Transformación de cada articulación
-new_origins = [[0,0,0,1]]
-for i in range(len(origins)):
-  new_origins.append(np.dot(T_matrices[i], origins[i]).tolist())
-
-# Mostrar resultado de la cinemática directa
-muestra_origenes(new_origins)
-muestra_robot(new_origins)
+  new_input = ask_new_input()
+  update_manipulator(new_input)
