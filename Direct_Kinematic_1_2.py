@@ -5,9 +5,6 @@
 # Grado en Ingeniería Informática (Cuarto)
 # Práctica: Resolución de la cinemática directa mediante Denavit-Hartenberg.
 
-# Ejemplo:
-# ./cdDH.py 30 45
-
 import sys
 from math import *
 import numpy as np
@@ -128,11 +125,12 @@ filename = sys.argv[1]
 # manipulator = [d,theta,a,alpha]
 manipulator = []
 with open(filename, 'r') as file:
-  number_of_joints = int(file.readline())
+  values = []
   for j in range(4):
     line = file.readline().split()
     values = [float(value) for value in line]
     manipulator.append(values)
+  number_of_joints = len(values)
 
 while True:
   # Orígenes para cada articulación

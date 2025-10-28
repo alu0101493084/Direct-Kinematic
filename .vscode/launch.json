@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["manipulators/m1.txt"]
+            "args": ["5 0 5 30 30"]
         }
     ]
 }
